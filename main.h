@@ -7,6 +7,7 @@
 #define GFX_XAXIS 64
 #define GFX_YAXIS 32
 #define OFFSET_FONT 50
+#define FONTSET_SIZE 80
 
 // CPU Specifications
 typedef struct chip8_t
