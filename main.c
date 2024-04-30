@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "main.h"
 
 void initialize_chip(chip8_t* c);
@@ -91,10 +92,89 @@ void emulate_cycle(chip8_t* c)
 					c->v[(c->opcode & 0x0F00) >> 8] += c->v[(c->opcode & 0x00F0) >> 4];
 					c->pc += 2;
 					break;
-					
-	
+				default:
+					printf("Unknown opcode: %d\r\n", c->opcode);
 			}
-			
+
+		// 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows). Width locked at 8 pixels. 
+		// Each row of 8 pixels read as bit coded starting from memory location I 
+		// This function does not change value of I. Current state of pixel XOR'd with current value in memory. 
+		// If pixels changed from 1 to 0, VF = 1 (collision detection)
+		// In other words, set VF if a new sprite collides with what's already on screen
+		case 0xD000:
+			uint16_t x = c->v[(c->opcode & 0x0F00) >> 8];
+			uint16_t y = c->v[(c->opcode & 0x00F0) >> 4];
+
+			uint16_t height = c->v[c->opcode & 0x000F];	
+			uint16_t pixel;
+
+			// Reset VF
+			c->v[0xF] = 0;
+
+			// Loop over each row
+			for(uint16_t yline = 0; yline < height; yline++)
+			{
+				// Fetch pixel value starting from memory location i.
+				pixel = c->memory[c->i + yline];
+
+				// Loop over 8 bits of one row
+				for(uint16_t xline = 0; xline < SPRITE_MAX_WIDTH; xline++)
+				{
+					// Check if the current evaluated pixel is set to 1 (Note that 0x80 >> xline scan through the byte, one bit at the time)
+					if(pixel & (0x80 >> xline) != 0	)
+					{
+						// Check if the pixel on the display is set to 1. If set, we need to register the collision by setting the VF register
+						if(c->gfx[(x + xline + ((y + yline) * GFX_XAXIS))])
+						{
+							c->v[0xF] = 1;	
+						}
+						// Set the pixel value by using XOR
+						c->gfx[(x + xline + ((y + yline) * GFX_XAXIS))] ^= 1;
+					}
+				}
+			}
+
+			// We changed our gfx[] array and thus need to update the screen
+			c->draw_flag = true;
+
+			c->pc += 2;
+
+			break;
+		case 0xE000:
+			switch(c->opcode & 0x00FF)
+			{
+				// 0xEX9E: Skip next instruction if key with the value of Vx is pressed
+				case 0x009E:
+					c->pc += 2;
+					if(c->key[c->v[(c->opcode & 0x0F00) >> 8]])
+					{
+						c->pc += 2;
+					}
+					break;
+				// 0xEXA1: Skip next instruction if key with the value of Vx is not pressed
+				case 0x00A1:
+					c->pc += 2;
+					if(!c->key[c->v[(c->opcode & 0x0F00) >> 8]])
+					{
+						c->pc += 2;
+					}
+					break;
+				default:
+					printf("Unknown opcode: %d\r\n", c->opcode);
+			}
+		case 0xF000:
+			switch(c->opcode & 0x00FF)
+			{
+				// 0xFX33: Store BCD representation of Vx in memory locations I, I+1, and I+2
+				case 0x0033:
+					c->memory[c->i] = c->v[(c->opcode & 0x0F00) >> 8] / 100;
+					c->memory[c->i + 1] = (c->v[(c->opcode & 0x0F00) >> 8] / 10) % 10;
+					c->memory[c->i + 2] = c->v[(c->opcode & 0x0F00) >> 8] % 10;
+					c->pc += 2;
+					break;
+				default:
+					printf("Unknown opcode: %d\r\n", c->opcode);
+			}
 	}
 		
 }

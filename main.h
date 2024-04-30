@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdbool.h>
 
 #define SIZE_MEMORY 4096
 #define SIZE_STACK 16
@@ -8,6 +9,20 @@
 #define GFX_YAXIS 32
 #define OFFSET_FONT 50
 #define FONTSET_SIZE 80
+#define SPRITE_MAX_WIDTH 8
+
+/* Input keys
+ * Keypad       Keyboard
++-+-+-+-+    +-+-+-+-+
+|1|2|3|C|    |1|2|3|4|
++-+-+-+-+    +-+-+-+-+
+|4|5|6|D|    |Q|W|E|R|
++-+-+-+-+ => +-+-+-+-+
+|7|8|9|E|    |A|S|D|F|
++-+-+-+-+    +-+-+-+-+
+|A|0|B|F|    |Z|X|C|V|
++-+-+-+-+    +-+-+-+-+
+*/
 
 // CPU Specifications
 typedef struct chip8_t
@@ -29,7 +44,7 @@ typedef struct chip8_t
 	// Array for hex-based keypad (0x0 - 0xF)
 	uint8_t key[NUM_KEYS];
 	// Current opcode (2 bytes)
-	uint16_t  opcode;
+	uint16_t opcode;
 	// Index register I
 	uint16_t i;
 	// Program counter
@@ -38,6 +53,9 @@ typedef struct chip8_t
 	uint16_t stack[SIZE_STACK];
 	// Stack pointer to keep track of where we are in stack
 	uint16_t sp;
+	// Flag which specifies screen needs to be updated
+	bool draw_flag;
 	// Note: Chip 8 does not have any interrupts or hardware registers
 
 } chip8_t;
+
