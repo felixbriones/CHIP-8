@@ -9,7 +9,28 @@ void initialize_chip(chip8_t* c);
 int main(int argc, char** argv)
 {
 	chip8_t chip;
+
+
+	//setup_graphics();
+	//setup_input();
+	
 	initialize_chip(&chip);
+	//load_game();
+
+	for(;;)
+	{
+		// Emulate 1 cycle	
+		emulate_cycle(&chip);
+
+		// Update screen if draw flag is set
+		if(chip.draw_flag)
+		{
+			draw_graphics();
+		}
+		
+		// Store key press state (Press & release)
+		set_keys();
+	}
 
 	return 0;	
 }
@@ -58,9 +79,13 @@ void emulate_cycle(chip8_t* c)
 			{
 				// 0x00E0: Clear screen
 				case 0x0000:
+						
 					break;
-				// 0x00EE: Return from subroutine
+				// 0x00EE: Return from subroutine. The interpreter sets the program counter to the address at the top of the stack, 
+				// then subtracts 1 from the stack pointer.
 				case 0x000E:
+					c->pc = c->stack[c->sp];
+					c->sp--;
 					break;
 				default:
 					printf("Unknown opcode: %d\r\n", c->opcode);
@@ -136,7 +161,6 @@ void emulate_cycle(chip8_t* c)
 
 			// We changed our gfx[] array and thus need to update the screen
 			c->draw_flag = true;
-
 			c->pc += 2;
 
 			break;
@@ -175,6 +199,21 @@ void emulate_cycle(chip8_t* c)
 				default:
 					printf("Unknown opcode: %d\r\n", c->opcode);
 			}
+	}
+	
+	// Update timers (@60Hz)
+	if(c->delay_timer > 0)
+	{
+		--c->delay_timer;
+	}
+
+	if(c->sound_timer > 0)
+	{
+		--c->sound_timer;
+		if(sound_timer == 1)
+		{
+			printf("Beep");
+		}
 	}
 		
 }
