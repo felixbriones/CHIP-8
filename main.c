@@ -89,6 +89,10 @@ void emulate_cycle(chip8_t* chip)
 					printf("Unknown opcode: %d\r\n", chip->opcode);
 			}
 		break;
+		// 0x1NNN (JP): Jump to subroutine @ NNN 
+		case 0x1000:
+			execute_opcode_0x1NNN(chip);
+			break;	
 		// 0x2NNN: Call subroutine @ NNN 
 		case 0x2000:
 			execute_opcode_0x2NNN(chip);
@@ -151,12 +155,12 @@ void emulate_cycle(chip8_t* chip)
 		
 }
 
-// 0x0000: Clear screen
+// 0x0000 (CLS): Clear screen
 void execute_opcode_0x00E0(void)
 {
 }
 
-// 0x00EE: Return from subroutine. The interpreter sets the program counter to the address at the top of the stack, 
+// 0x00EE (RET): Return from subroutine. The interpreter sets the program counter to the address at the top of the stack, 
 // then subtracts 1 from the stack pointer.
 void execute_opcode_0x00EE(chip8_t* chip)
 {
@@ -164,7 +168,14 @@ void execute_opcode_0x00EE(chip8_t* chip)
 	chip->sp--;
 }
 
-// 0x2NNN: Call subroutine @ NNN 
+// 0x1NNN (JP): Jump to subroutine @ NNN 
+// Note: Unlike CALL, this only changes PC without updating the stack
+void execute_opcode_0x1NNN(chip8_t* chip)
+{
+	chip->pc = chip->opcode & 0xFFF;
+}
+
+// 0x2NNN (CALL): Call subroutine @ NNN 
 // Place current address of PC on stack, jump to subroutine, increment SP, and update PC
 void execute_opcode_0x2NNN(chip8_t* chip)
 {

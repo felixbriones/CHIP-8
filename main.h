@@ -64,6 +64,8 @@ typedef struct chip8_t
 void execute_opcode_0x00E0(void);
 // 0x00EE: Return from subroutine
 void execute_opcode_0x00EE(chip8_t* chip);
+// 0x1NNN (JP): Jump to subroutine @ NNN 
+void execute_opcode_0x1NNN(chip8_t* chip);
 // 0x2NNN: Call subroutine @ NNN 
 void execute_opcode_0x2NNN(chip8_t* chip);
 // 0x8XYN: Perform addition operation. Vx = Vx + Vy. VF is carry
