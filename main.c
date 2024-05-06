@@ -199,7 +199,7 @@ void execute_opcode_0x2NNN(chip8_t* chip)
 // 0x3XKK (SE): Skip next instruction if Vx = KK
 void execute_opcode_0x3XKK(chip8_t* chip)
 {
-	uint8_t vx = chip->v[chip->opcode & 0x0F00];
+	uint8_t vx = chip->v[(chip->opcode & 0x0F00) >> 8];
 	uint8_t byte = chip->opcode & 0x00FF;
 
 	if(vx == byte)
@@ -212,7 +212,7 @@ void execute_opcode_0x3XKK(chip8_t* chip)
 // 0x4XKK (SNE): Skip next instruction if Vx != KK
 void execute_opcode_0x4XKK(chip8_t* chip)
 {
-	uint8_t vx = chip->v[chip->opcode & 0x0F00];
+	uint8_t vx = chip->v[(chip->opcode & 0x0F00) >> 8];
 	uint8_t byte = chip->opcode & 0x00FF;
 
 	if(vx != byte)
