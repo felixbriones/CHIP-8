@@ -109,6 +109,10 @@ void emulate_cycle(chip8_t* chip)
 		case 0x5000:
 			execute_opcode_0x5XY0(chip);
 			break;	
+		// 0x6XKK (LD): Places the value KK into register Vx
+		case 0x6000:
+			execute_opcode_0x6XKK(chip);
+			break;	
 		case 0x8000:
 			switch(chip->opcode & 0x000F)
 			{
@@ -232,6 +236,13 @@ void execute_opcode_0x5XY0(chip8_t* chip)
 		chip->pc += 2;
 	}
 	chip->pc += 2;
+}
+
+// 0x6XKK (LD): Places the value KK into register Vx
+void execute_opcode_0x6XKK(chip8_t* chip)
+{
+	uint8_t byte = chip->opcode & 0x00FF;
+	chip->v[(chip->opcode & 0x0F00) >> 8] = byte;
 }
 
 // 0x8XY4: Add Vy to Vx. If sum is greater than 255, VF is set 1 (0 otherwise). Sum stored in Vx 
