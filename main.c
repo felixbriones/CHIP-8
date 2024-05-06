@@ -105,6 +105,10 @@ void emulate_cycle(chip8_t* chip)
 		case 0x4000:
 			execute_opcode_0x4XKK(chip);
 			break;	
+		// 0x5XY0 (SE): Skip next instruction if Vx = Vy
+		case 0x5000:
+			execute_opcode_0x5XY0(chip);
+			break;	
 		case 0x8000:
 			switch(chip->opcode & 0x000F)
 			{
@@ -212,6 +216,18 @@ void execute_opcode_0x4XKK(chip8_t* chip)
 	uint8_t byte = chip->opcode & 0x00FF;
 
 	if(vx != byte)
+	{
+		chip->pc += 2;
+	}
+	chip->pc += 2;
+}
+
+// 0x5XY0 (SE): Skip next instruction if Vx = Vy
+void execute_opcode_0x5XY0(chip8_t* chip)
+{
+	uint8_t vx = chip->v[(chip->opcode & 0x0F00) >> 8];
+	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
+	if(vx == vy)
 	{
 		chip->pc += 2;
 	}

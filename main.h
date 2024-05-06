@@ -72,6 +72,8 @@ void execute_opcode_0x2NNN(chip8_t* chip);
 void execute_opcode_0x3XKK(chip8_t* chip);
 // 0x4XKK (SNE): Skip next instruction if Vx != KK
 void execute_opcode_0x4XKK(chip8_t* chip);
+// 0x5XY0 (SE): Skip next instruction if Vx = Vy
+void execute_opcode_0x5XY0(chip8_t* chip);
 // 0x8XYN: Perform addition operation. Vx = Vx + Vy. VF is carry
 void execute_opcode_0x8XY4(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
