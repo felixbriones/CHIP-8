@@ -59,3 +59,23 @@ typedef struct chip8_t
 
 } chip8_t;
 
+// Opcode execution prototypes:
+// 0x0000: Clear screen
+void execute_opcode_0x00E0(void);
+// 0x00EE: Return from subroutine
+void execute_opcode_0x00EE(chip8_t* chip);
+// 0x2NNN: Call subroutine @ NNN 
+void execute_opcode_0x2NNN(chip8_t* chip);
+// 0x8XYN: Perform addition operation. Vx = Vx + Vy. VF is carry
+void execute_opcode_0x8XY4(chip8_t* chip);
+// 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
+void execute_opcode_0xDXYN(chip8_t* chip);
+// 0xEX9E: Skip next instruction if key with the value of Vx is pressed
+void execute_opcode_0xEX9E(chip8_t* chip);
+// 0xEXA1: Skip next instruction if key with the value of Vx is not pressed
+void execute_opcode_0xEXA1(chip8_t* chip);
+// 0xFX33: Store BCD representation of Vx in memory locations I, I+1, and I+2
+void execute_opcode_0xFX33(chip8_t* chip);
+
+// Emulator operations prototypes:
+void emulate_cycle(chip8_t* c);
