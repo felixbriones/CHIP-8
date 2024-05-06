@@ -66,7 +66,7 @@ void execute_opcode_0x00E0(void);
 void execute_opcode_0x00EE(chip8_t* chip);
 // 0x1NNN (JP): Jump to subroutine @ NNN 
 void execute_opcode_0x1NNN(chip8_t* chip);
-// 0x2NNN: Call subroutine @ NNN 
+// 0x2NNN (CALL): Call subroutine @ NNN 
 void execute_opcode_0x2NNN(chip8_t* chip);
 // 0x3XKK (SE): Skip next instruction if Vx = KK
 void execute_opcode_0x3XKK(chip8_t* chip);
@@ -76,6 +76,8 @@ void execute_opcode_0x4XKK(chip8_t* chip);
 void execute_opcode_0x5XY0(chip8_t* chip);
 // 0x6XKK (LD): Places the value KK into register Vx
 void execute_opcode_0x6XKK(chip8_t* chip);
+// 0x7XKK (ADD): Adds the value kk to the value of register Vx, then stores the result in Vx. (Vx = Vx + kk)
+void execute_opcode_0x7XKK(chip8_t* chip);
 // 0x8XYN: Perform addition operation. Vx = Vx + Vy. VF is carry
 void execute_opcode_0x8XY4(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
