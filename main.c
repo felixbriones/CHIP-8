@@ -97,6 +97,10 @@ void emulate_cycle(chip8_t* chip)
 		case 0x2000:
 			execute_opcode_0x2NNN(chip);
 			break;	
+		// 0x3XKK (SE): Skip next instruction if Vx = KK
+		case 0x3000:
+			execute_opcode_0x3XKK(chip);
+			break;	
 		case 0x8000:
 			switch(chip->opcode & 0x000F)
 			{
@@ -182,6 +186,19 @@ void execute_opcode_0x2NNN(chip8_t* chip)
 	chip->stack[chip->sp] = chip->pc;
 	chip->sp++;
 	chip->pc = chip->opcode & 0xFFF;
+}
+
+// 0x3XKK (SE): Skip next instruction if Vx = KK
+void execute_opcode_0x3XKK(chip8_t* chip)
+{
+	uint8_t vx = chip->v[chip->opcode & 0x0F00];
+	uint8_t byte = chip->opcode & 0x00FF;
+
+	if(vx == byte)
+	{
+		chip->pc += 2;
+	}
+	chip->pc += 2;
 }
 
 // 0x8XY4: Add Vy to Vx. If sum is greater than 255, VF is set 1 (0 otherwise). Sum stored in Vx 
