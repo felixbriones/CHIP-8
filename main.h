@@ -78,7 +78,9 @@ void execute_opcode_0x5XY0(chip8_t* chip);
 void execute_opcode_0x6XKK(chip8_t* chip);
 // 0x7XKK (ADD): Adds the value kk to the value of register Vx, then stores the result in Vx. (Vx = Vx + kk)
 void execute_opcode_0x7XKK(chip8_t* chip);
-// 0x8XYN: Perform addition operation. Vx = Vx + Vy. VF is carry
+// 0x8XY0 (LD): Stores the value of register Vy in register Vx (Vx = Vy)
+void execute_opcode_0x8XY0(chip8_t* chip);
+// 0x8XY4: Perform addition operation. Vx = Vx + Vy. VF is carry
 void execute_opcode_0x8XY4(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
 void execute_opcode_0xDXYN(chip8_t* chip);

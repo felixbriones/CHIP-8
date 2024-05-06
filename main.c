@@ -120,7 +120,11 @@ void emulate_cycle(chip8_t* chip)
 		case 0x8000:
 			switch(chip->opcode & 0x000F)
 			{
-				// 0x8XY4: Perform addition operation.
+				// 0x8XY0 (LD): Stores the value of register Vy in register Vx
+				case 0x0000:
+					execute_opcode_0x8XY0(chip);
+					break;
+				// 0x8XY4 (ADD): Vx = Vx + Vy 
 				case 0x0004:
 					execute_opcode_0x8XY4(chip);
 					break;
@@ -254,6 +258,15 @@ void execute_opcode_0x7XKK(chip8_t* chip)
 {
 	uint8_t byte = chip->opcode & 0x00FF;
 	chip->v[(chip->opcode & 0x0F00) >> 8] += byte;
+}
+
+// 0x8XY0 (LD): Stores the value of register Vy in register Vx (Vx = Vy)
+void execute_opcode_0x8XY0(chip8_t* chip)
+{
+	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
+
+	// Vx
+	chip->v[(chip->opcode & 0x0F00) >> 8] = vy;
 }
 
 // 0x8XY4: Add Vy to Vx. If sum is greater than 255, VF is set 1 (0 otherwise). Sum stored in Vx 
