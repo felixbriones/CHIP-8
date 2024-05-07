@@ -84,6 +84,8 @@ void execute_opcode_0x8XY0(chip8_t* chip);
 void execute_opcode_0x8XY1(chip8_t* chip);
 // 0x8XY2 (AND): AND operation with Vx and Vy. Result stored in Vx (Vx = Vx AND Vy)
 void execute_opcode_0x8XY2(chip8_t* chip);
+// 0x8XY3 (XOR): XOR operation with Vx and Vy. Result stored in Vx (Vx = Vx XOR Vy)
+void execute_opcode_0x8XY3(chip8_t* chip);
 // 0x8XY4: Perform addition operation. Vx = Vx + Vy. VF is carry
 void execute_opcode_0x8XY4(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)

@@ -132,6 +132,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x0002:
 					execute_opcode_0x8XY2(chip);
 					break;
+				// 0x8XY3 (XOR): XOR operation with Vx and Vy. Result stored in Vx
+				case 0x0003:
+					execute_opcode_0x8XY3(chip);
+					break;
 				// 0x8XY4 (ADD): Vx = Vx + Vy 
 				case 0x0004:
 					execute_opcode_0x8XY4(chip);
@@ -297,7 +301,18 @@ void execute_opcode_0x8XY2(chip8_t* chip)
 	uint8_t vx = chip->v[x];
 	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
 
-	// Perform OR operation and store in Vx
+	// Perform AND operation and store in Vx
+	chip->v[x] = vx&vy;
+}
+
+// 0x8XY3 (XOR): XOR operation with Vx and Vy. Result stored in Vx (Vx = Vx XOR Vy)
+void execute_opcode_0x8XY3(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+	uint8_t vx = chip->v[x];
+	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
+
+	// Perform XOR operation and store in Vx
 	chip->v[x] = vx&vy;
 }
 
