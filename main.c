@@ -152,6 +152,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x0007:
 					execute_opcode_0x8XY7(chip);
 					break;
+				// 0x8XYE (SHL): If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
+				case 0x000E:
+					execute_opcode_0x8XYE(chip);
+					break;
 				default:
 					printf("Unknown opcode: %d\r\n", chip->opcode);
 			}
@@ -390,8 +394,23 @@ void execute_opcode_0x8XY7(chip8_t* chip)
 	// Set VF if appropriate 
 	chip->v[0xF] = (vy > vx) ? 1 : 0;
 	
-	// Divide Vx by 2
+	// Subtract Vy from Vx
 	chip->v[x] = vy - vx;
+	chip->pc += 2;
+}
+
+// If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
+// Set Vx = Vx SHL 1.
+void execute_opcode_0x8XYE(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+	uint8_t vx = chip->v[x];
+
+	// Set VF if MSB is set
+	chip->v[0xF] = (vx & 0x80 == 0x80) ? 1 : 0;
+	
+	// Multiply Vx by 2
+	chip->v[x] *= 2;
 	chip->pc += 2;
 }
 
