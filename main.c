@@ -163,7 +163,11 @@ void emulate_cycle(chip8_t* chip)
 		case 0x9000:
 			execute_opcode_0x9XY0(chip);
 			break;
-		// 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels
+		// 0xANNN (LD): The value of register I is set to NNN
+		case 0xA000:
+			execute_opcode_0xANNN(chip);
+			break;
+		// 0xDXYN (DRW): Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels
 		case 0xD000:
 			execute_opcode_0xDXYN(chip);
 			break;
@@ -432,7 +436,15 @@ void execute_opcode_0x9XY0(chip8_t* chip)
 	chip->pc += 2;
 }
 
-// 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows). Width locked at 8 pixels. 
+// 0xANNN (LD): The value of register I is set to NNN
+// Set I = nnn.
+void execute_opcode_0xANNN(chip8_t* chip)
+{
+	chip->i = chip->opcode & 0xFFF;
+	chip->pc += 2;
+}
+
+// 0xDXYN (DRW): Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows). Width locked at 8 pixels. 
 // Each row of 8 pixels read as bit coded starting from memory location I 
 // This function does not change value of I. Current state of pixel XOR'd with current value in memory. 
 // If pixels changed from 1 to 0, VF = 1 (collision detection)

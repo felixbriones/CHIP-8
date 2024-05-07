@@ -98,6 +98,8 @@ void execute_opcode_0x8XY7(chip8_t* chip);
 void execute_opcode_0x8XYE(chip8_t* chip);
 // 0x9XY0 (SNE): The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
 void execute_opcode_0x9XY0(chip8_t* chip);
+// 0xANNN (LD): The value of register I is set to NNN
+void execute_opcode_0xANNN(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
 void execute_opcode_0xDXYN(chip8_t* chip);
 // 0xEX9E: Skip next instruction if key with the value of Vx is pressed
