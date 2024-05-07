@@ -86,16 +86,18 @@ void execute_opcode_0x8XY1(chip8_t* chip);
 void execute_opcode_0x8XY2(chip8_t* chip);
 // 0x8XY3 (XOR): XOR operation with Vx and Vy. Result stored in Vx (Vx = Vx XOR Vy)
 void execute_opcode_0x8XY3(chip8_t* chip);
-// 0x8XY4: Perform addition operation. Vx = Vx + Vy. VF is carry
+// 0x8XY4 (ADD): Add Vy to Vx. If sum is greater than 255, VF is set 1 (0 otherwise). Sum stored in Vx 
 void execute_opcode_0x8XY4(chip8_t* chip);
 // 0x8XY5 (SUB): Then Vy is subtracted from Vx, and the results stored in Vx.
 void execute_opcode_0x8XY5(chip8_t* chip);
 // 0x8XY6 (SHR): If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2.
 void execute_opcode_0x8XY6(chip8_t* chip);
-// Set Vx = Vy - Vx, set VF = NOT borrow.
+// 0x8XY7 (SUBN): If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
 void execute_opcode_0x8XY7(chip8_t* chip);
-// If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
+// 0x8XYE (SHL): If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
 void execute_opcode_0x8XYE(chip8_t* chip);
+// 0x9XY0 (SNE): The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
+void execute_opcode_0x9XY0(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
 void execute_opcode_0xDXYN(chip8_t* chip);
 // 0xEX9E: Skip next instruction if key with the value of Vx is pressed

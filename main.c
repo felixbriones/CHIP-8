@@ -159,7 +159,10 @@ void emulate_cycle(chip8_t* chip)
 				default:
 					printf("Unknown opcode: %d\r\n", chip->opcode);
 			}
-
+		// 0x9XY0 (SNE): The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
+		case 0x9000:
+			execute_opcode_0x9XY0(chip);
+			break;
 		// 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels
 		case 0xD000:
 			execute_opcode_0xDXYN(chip);
@@ -399,7 +402,7 @@ void execute_opcode_0x8XY7(chip8_t* chip)
 	chip->pc += 2;
 }
 
-// If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
+// 0x8XYE (SHL): If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
 // Set Vx = Vx SHL 1.
 void execute_opcode_0x8XYE(chip8_t* chip)
 {
@@ -411,6 +414,21 @@ void execute_opcode_0x8XYE(chip8_t* chip)
 	
 	// Multiply Vx by 2
 	chip->v[x] *= 2;
+	chip->pc += 2;
+}
+
+// 0x9XY0 (SNE): The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
+// Skip next instruction if Vx != Vy.
+void execute_opcode_0x9XY0(chip8_t* chip)
+{
+	uint8_t vx = chip->v[(chip->opcode & 0x0F00) >> 8];
+	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
+
+	// Skip next instruction if Vx and Vy are not equal
+	if(vx != vy)
+	{
+		chip->pc += 2;
+	}
 	chip->pc += 2;
 }
 
