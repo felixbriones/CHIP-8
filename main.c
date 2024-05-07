@@ -319,8 +319,12 @@ void execute_opcode_0x8XY3(chip8_t* chip)
 // 0x8XY4: Add Vy to Vx. If sum is greater than 255, VF is set 1 (0 otherwise). Sum stored in Vx 
 void execute_opcode_0x8XY4(chip8_t* chip)
 {
-	// Vx > 255 - Vy
-	if(chip->v[(chip->opcode & 0x0F00) >> 8] > 0xFF - chip->v[(chip->opcode & 0x00F0) >> 4])
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+	uint8_t vx = chip->v[x];
+	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
+
+	// Check if sum is greater than 255
+	if(vx > 0xFF - vy) 
 	{
 		chip->v[0xF] = 1;	
 	} 
@@ -329,7 +333,7 @@ void execute_opcode_0x8XY4(chip8_t* chip)
 		chip->v[0xF] = 0;	
 	}
 
-	chip->v[(chip->opcode & 0x0F00) >> 8] += chip->v[(chip->opcode & 0x00F0) >> 4];
+	chip->v[x] += vy;
 	chip->pc += 2;
 }
 
