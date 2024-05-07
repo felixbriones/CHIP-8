@@ -100,6 +100,8 @@ void execute_opcode_0x8XYE(chip8_t* chip);
 void execute_opcode_0x9XY0(chip8_t* chip);
 // 0xANNN (LD): The value of register I is set to NNN
 void execute_opcode_0xANNN(chip8_t* chip);
+// 0xBNNN (JP): The program counter is set to nnn plus the value of V0
+void execute_opcode_0xBNNN(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
 void execute_opcode_0xDXYN(chip8_t* chip);
 // 0xEX9E: Skip next instruction if key with the value of Vx is pressed

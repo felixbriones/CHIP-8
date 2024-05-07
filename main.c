@@ -167,6 +167,10 @@ void emulate_cycle(chip8_t* chip)
 		case 0xA000:
 			execute_opcode_0xANNN(chip);
 			break;
+		// 0xBNNN (JMP): The program counter is set to nnn plus the value of V0
+		case 0xB000:
+			execute_opcode_0xBNNN(chip);
+			break;
 		// 0xDXYN (DRW): Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels
 		case 0xD000:
 			execute_opcode_0xDXYN(chip);
@@ -442,6 +446,14 @@ void execute_opcode_0xANNN(chip8_t* chip)
 {
 	chip->i = chip->opcode & 0xFFF;
 	chip->pc += 2;
+}
+
+// 0xBNNN (JP): The program counter is set to nnn plus the value of V0
+// Jump to location nnn + V0
+void execute_opcode_0xBNNN(chip8_t* chip)
+{
+	uint16_t nibbles = chip->opcode & 0xFFF;
+	chip->pc = nibbles + chip->v[0];
 }
 
 // 0xDXYN (DRW): Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows). Width locked at 8 pixels. 
