@@ -92,6 +92,8 @@ void execute_opcode_0x8XY4(chip8_t* chip);
 void execute_opcode_0x8XY5(chip8_t* chip);
 // 0x8XY6 (SHR): If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2.
 void execute_opcode_0x8XY6(chip8_t* chip);
+// Set Vx = Vy - Vx, set VF = NOT borrow.
+void execute_opcode_0x8XY7(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
 void execute_opcode_0xDXYN(chip8_t* chip);
 // 0xEX9E: Skip next instruction if key with the value of Vx is pressed

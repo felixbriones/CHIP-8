@@ -148,6 +148,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x0006:
 					execute_opcode_0x8XY6(chip);
 					break;
+				// 0x8XY7 (SUBN): If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
+				case 0x0007:
+					execute_opcode_0x8XY7(chip);
+					break;
 				default:
 					printf("Unknown opcode: %d\r\n", chip->opcode);
 			}
@@ -346,6 +350,7 @@ void execute_opcode_0x8XY4(chip8_t* chip)
 }
 
 // 0x8XY5 (SUB): If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
+// Set Vx = Vx - Vy, set VF = NOT borrow.
 void execute_opcode_0x8XY5(chip8_t* chip)
 {
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
@@ -371,6 +376,22 @@ void execute_opcode_0x8XY6(chip8_t* chip)
 	
 	// Divide Vx by 2
 	chip->v[x] /= 2;
+	chip->pc += 2;
+}
+
+// 0x8XY7 (SUBN): If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
+// Set Vx = Vy - Vx, set VF = NOT borrow.
+void execute_opcode_0x8XY7(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+	uint8_t vx = chip->v[x];
+	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
+
+	// Set VF if appropriate 
+	chip->v[0xF] = (vy > vx) ? 1 : 0;
+	
+	// Divide Vx by 2
+	chip->v[x] = vy - vx;
 	chip->pc += 2;
 }
 
