@@ -88,6 +88,8 @@ void execute_opcode_0x8XY2(chip8_t* chip);
 void execute_opcode_0x8XY3(chip8_t* chip);
 // 0x8XY4: Perform addition operation. Vx = Vx + Vy. VF is carry
 void execute_opcode_0x8XY4(chip8_t* chip);
+// 0x8XY5 (SUB): Then Vy is subtracted from Vx, and the results stored in Vx.
+void execute_opcode_0x8XY5(chip8_t* chip);
 // 0xDXYN: Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows)
 void execute_opcode_0xDXYN(chip8_t* chip);
 // 0xEX9E: Skip next instruction if key with the value of Vx is pressed

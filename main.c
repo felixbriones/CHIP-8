@@ -140,6 +140,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x0004:
 					execute_opcode_0x8XY4(chip);
 					break;
+				// 0x8XY5 (SUB): Vx = Vx - Vy 
+				case 0x0005:
+					execute_opcode_0x8XY5(chip);
+					break;
 				default:
 					printf("Unknown opcode: %d\r\n", chip->opcode);
 			}
@@ -316,7 +320,7 @@ void execute_opcode_0x8XY3(chip8_t* chip)
 	chip->v[x] = vx&vy;
 }
 
-// 0x8XY4: Add Vy to Vx. If sum is greater than 255, VF is set 1 (0 otherwise). Sum stored in Vx 
+// 0x8XY4 (ADD): Add Vy to Vx. If sum is greater than 255, VF is set 1 (0 otherwise). Sum stored in Vx 
 void execute_opcode_0x8XY4(chip8_t* chip)
 {
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
@@ -334,6 +338,21 @@ void execute_opcode_0x8XY4(chip8_t* chip)
 	}
 
 	chip->v[x] += vy;
+	chip->pc += 2;
+}
+
+// 0x8XY5 (SUB): If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
+void execute_opcode_0x8XY5(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+	uint8_t vx = chip->v[x];
+	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
+	
+	// Set VF if appropriate 
+	chip->v[0xF] = (vx > vy) ? 1 : 0;
+
+	// Subtract
+	chip->v[x] -= vy;
 	chip->pc += 2;
 }
 
