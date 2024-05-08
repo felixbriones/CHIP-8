@@ -1,7 +1,9 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 #include "main.h"
 
 void initialize_chip(chip8_t* c);
@@ -171,6 +173,10 @@ void emulate_cycle(chip8_t* chip)
 		case 0xB000:
 			execute_opcode_0xBNNN(chip);
 			break;
+		// 0xCXKK (RND): Set Vx = random byte AND kk. 
+		case 0xC000:
+			execute_opcode_0xCXKK(chip);
+			break;
 		// 0xDXYN (DRW): Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels
 		case 0xD000:
 			execute_opcode_0xDXYN(chip);
@@ -178,11 +184,11 @@ void emulate_cycle(chip8_t* chip)
 		case 0xE000:
 			switch(chip->opcode & 0x00FF)
 			{
-				// 0xEX9E: Skip next instruction if key with the value of Vx is pressed
+				// 0xEX9E (SKP): Skip next instruction if key with the value of Vx is pressed
 				case 0x009E:
 					execute_opcode_0xEX9E(chip);
 					break;
-				// 0xEXA1: Skip next instruction if key with the value of Vx is not pressed
+				// 0xEXA1 (SKNP): Skip next instruction if key with the value of Vx is not pressed
 				case 0x00A1:
 					execute_opcode_0xEXA1(chip);
 					break;
@@ -192,7 +198,11 @@ void emulate_cycle(chip8_t* chip)
 		case 0xF000:
 			switch(chip->opcode & 0x00FF)
 			{
-				// 0xFX33: Store BCD representation of Vx in memory locations I, I+1, and I+2
+				// 0xFX07 (LD): The value of DT is placed into Vx.
+				case 0x0007:
+					execute_opcode_0xFX07(chip);
+					break;
+				// 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 				case 0x0033:
 					execute_opcode_0xFX33(chip);
 					break;
@@ -456,6 +466,20 @@ void execute_opcode_0xBNNN(chip8_t* chip)
 	chip->pc = nibbles + chip->v[0];
 }
 
+// 0xCXKK (RND): The interpreter generates a random number from 0 to 255, which is then ANDed with the value kk. The results are stored in Vx. 
+// Set Vx = random byte AND kk.
+void execute_opcode_0xCXKK(chip8_t* chip)
+{
+	srand(time(NULL));	
+	uint8_t random = rand() % 255;
+	uint8_t byte = chip->opcode & 0xFF;	
+	uint8_t x = (chip->opcode & 0xF00) >> 8;
+
+	// AND random number w/ kk
+	chip->v[x] = random & byte;
+	chip->pc += 2;
+}
+
 // 0xDXYN (DRW): Draw a sprite at coordinate (value @ Vx, value @ Vy) with a height of n pixels (rows). Width locked at 8 pixels. 
 // Each row of 8 pixels read as bit coded starting from memory location I 
 // This function does not change value of I. Current state of pixel XOR'd with current value in memory. 
@@ -500,9 +524,10 @@ void execute_opcode_0xDXYN(chip8_t* chip)
 	chip->pc += 2;
 }
 
-// 0xEX9E: Skip next instruction if key with the value of Vx is pressed
+// 0xEX9E (SKP): Skip next instruction if key with the value of Vx is pressed.
+// Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2
 void execute_opcode_0xEX9E(chip8_t* chip)
-{
+{	
 	chip->pc += 2;
 	if(chip->key[chip->v[(chip->opcode & 0x0F00) >> 8]])
 	{
@@ -510,7 +535,8 @@ void execute_opcode_0xEX9E(chip8_t* chip)
 	}
 }
 
-// 0xEXA1: Skip next instruction if key with the value of Vx is not pressed
+// 0xEXA1 (SKNP): Skip next instruction if key with the value of Vx is not pressed.
+// Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
 void execute_opcode_0xEXA1(chip8_t* chip)
 {
 	chip->pc += 2;
@@ -518,6 +544,16 @@ void execute_opcode_0xEXA1(chip8_t* chip)
 	{
 		chip->pc += 2;
 	}
+}
+
+// 0xFX07 (LD): The value of DT is placed into Vx.
+// Set Vx = delay timer value.
+void execute_opcode_0xFX07(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+
+	chip->v[x] = chip->delay_timer;
+	chip->pc += 2;
 }
 
 // 0xFX33: Store BCD representation of Vx in memory locations I, I+1, and I+2
