@@ -206,6 +206,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x000A:
 					execute_opcode_0xFX0A(chip);
 					break;
+				// 0xFX15 (LD): DT is set equal to the value of Vx.
+				case 0x0015:
+					execute_opcode_0xFX15(chip);
+					break;
 				// 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 				case 0x0033:
 					execute_opcode_0xFX33(chip);
@@ -567,6 +571,7 @@ void execute_opcode_0xFX0A(chip8_t* chip)
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
 	uint8_t key_press;
 
+	// Check all 15 keys for a key press
 	for(uint8_t i = 0; i < NUM_KEYS; i++)
 	{
 		key_press = chip->key[i];
@@ -578,6 +583,16 @@ void execute_opcode_0xFX0A(chip8_t* chip)
 			return;
 		}
 	}
+}
+
+// 0xFX15 (LD): DT is set equal to the value of Vx.
+// Set delay timer = Vx.
+void execute_opcode_0xFX15(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+
+	chip->delay_timer = chip->v[x];
+	chip->pc += 2;
 }
 
 // 0xFX33: Store BCD representation of Vx in memory locations I, I+1, and I+2
