@@ -202,6 +202,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x0007:
 					execute_opcode_0xFX07(chip);
 					break;
+				// 0xFX0A (LD): Wait for a key press, store the value of the key in Vx.
+				case 0x000A:
+					execute_opcode_0xFX0A(chip);
+					break;
 				// 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 				case 0x0033:
 					execute_opcode_0xFX33(chip);
@@ -554,6 +558,26 @@ void execute_opcode_0xFX07(chip8_t* chip)
 
 	chip->v[x] = chip->delay_timer;
 	chip->pc += 2;
+}
+
+// 0xFX0A (LD): Wait for a key press, store the value of the key in Vx.
+// All execution stops until a key is pressed, then the value of that key is stored in Vx.
+void execute_opcode_0xFX0A(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+	uint8_t key_press;
+
+	for(uint8_t i = 0; i < NUM_KEYS; i++)
+	{
+		key_press = chip->key[i];
+		if(key_press)
+		{
+			chip->v[x] = key_press;
+			// Only increment once a key has been pressed to simulate waiting 
+			chip->pc += 2;
+			return;
+		}
+	}
 }
 
 // 0xFX33: Store BCD representation of Vx in memory locations I, I+1, and I+2

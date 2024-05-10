@@ -112,6 +112,8 @@ void execute_opcode_0xEX9E(chip8_t* chip);
 void execute_opcode_0xEXA1(chip8_t* chip);
 // 0xFX07 (LD): The value of DT is placed into Vx.
 void execute_opcode_0xFX07(chip8_t* chip);
+// 0xFX0A (LD): Wait for a key press, store the value of the key in Vx.
+void execute_opcode_0xFX0A(chip8_t* chip);
 // 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 void execute_opcode_0xFX33(chip8_t* chip);
 
