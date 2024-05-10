@@ -226,6 +226,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x0033:
 					execute_opcode_0xFX33(chip);
 					break;
+				// 0xFX55 (LD): Store registers V0 through Vx in memory starting at location I.
+				case 0x0055:
+					execute_opcode_0xFX55(chip);
+					break;
 				default:
 					printf("Unknown opcode: %d\r\n", chip->opcode);
 			}
@@ -639,12 +643,25 @@ void execute_opcode_0xFX29(chip8_t* chip)
 	chip->pc += 2;
 }
 
-// 0xFX33: Store BCD representation of Vx in memory locations I, I+1, and I+2
+// 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 // Example: Integer = 143.  memory[i] = 1, memory[i+1] = 4, memory[i+2] = 3
 void execute_opcode_0xFX33(chip8_t* chip)
 {
 	chip->memory[chip->i] = chip->v[(chip->opcode & 0x0F00) >> 8] / 100;
 	chip->memory[chip->i + 1] = (chip->v[(chip->opcode & 0x0F00) >> 8] / 10) % 10;
 	chip->memory[chip->i + 2] = chip->v[(chip->opcode & 0x0F00) >> 8] % 10;
+	chip->pc += 2;
+}
+
+// 0xFX55 (LD): Store registers V0 through Vx in memory starting at location I.
+// The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I.
+void execute_opcode_0xFX55(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+
+	for(uint8_t j = 0; j <= x; j++)
+	{
+		chip->memory[chip->i + j] = chip->v[j];
+	}
 	chip->pc += 2;
 }

@@ -125,6 +125,8 @@ void execute_opcode_0xFX1E(chip8_t* chip);
 void execute_opcode_0xFX29(chip8_t* chip);
 // 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 void execute_opcode_0xFX33(chip8_t* chip);
+// 0xFX55 (LD): Store registers V0 through Vx in memory starting at location I.
+void execute_opcode_0xFX55(chip8_t* chip);
 
 // Emulator operations prototypes:
 void emulate_cycle(chip8_t* c);
