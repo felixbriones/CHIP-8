@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include <unistd.h>
 #include "main.h"
 
 void initialize_chip(chip8_t* c);
@@ -240,20 +241,31 @@ void emulate_cycle(chip8_t* chip)
 	}
 	
 	// Update timers (@60Hz)
-	if(chip->delay_timer > 0)
-	{
-		--chip->delay_timer;
-	}
+	usleep(PERIOD_60HZ);
+	handle_delay_timer(chip);
+	handle_sound_timer(chip);
+}
 
-	if(chip->sound_timer > 0)
+void handle_delay_timer(chip8_t* chip)
+{
+	if(chip->delay_timer == 0)
 	{
-		--chip->sound_timer;
-		if(chip->sound_timer == 1)
-		{
-			printf("Beep");
-		}
+		return;
 	}
-		
+	--chip->delay_timer;
+}
+
+void handle_sound_timer(chip8_t* chip)
+{
+	if(chip->delay_timer == 0)
+	{
+		return;
+	}
+	if(chip->delay_timer == 1)
+	{
+		printf("beep");
+	}
+	--chip->sound_timer;
 }
 
 // 0x0000 (CLS): Clear screen

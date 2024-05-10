@@ -11,6 +11,7 @@
 #define OFFSET_FONT 50
 #define FONTSET_SIZE 80
 #define SPRITE_MAX_WIDTH 8
+#define PERIOD_60HZ 16667
 
 /* Input keys
  * Keypad       Keyboard
@@ -132,3 +133,5 @@ void execute_opcode_0xFX65(chip8_t* chip);
 
 // Emulator operations prototypes:
 void emulate_cycle(chip8_t* c);
+void handle_delay_timer(chip8_t* chip);
+void handle_sound_timer(chip8_t* chip);
