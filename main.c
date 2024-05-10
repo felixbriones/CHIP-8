@@ -218,6 +218,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x001E:
 					execute_opcode_0xFX1E(chip);
 					break;
+				// 0xFX29 (LD): Set I = location of sprite for digit Vx.
+				case 0x0029:
+					execute_opcode_0xFX29(chip);
+					break;
 				// 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 				case 0x0033:
 					execute_opcode_0xFX33(chip);
@@ -620,6 +624,18 @@ void execute_opcode_0xFX1E(chip8_t* chip)
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
 
 	chip->i += chip->v[x];
+	chip->pc += 2;
+}
+
+// 0xFX29 (LD): The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal font.
+// Set I = location of sprite for digit Vx.
+void execute_opcode_0xFX29(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+	uint8_t digit = chip->v[x];
+
+	// Fontset begins @ Memory address 0x50, starting with 0. Each individual digit is 5 bytes in size
+	chip->i = (digit * SIZE_FONT_CHAR) + OFFSET_FONT;
 	chip->pc += 2;
 }
 

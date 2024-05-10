@@ -3,6 +3,7 @@
 
 #define SIZE_MEMORY 4096
 #define SIZE_STACK 16
+#define SIZE_FONT_CHAR 5
 #define NUM_GENERAL_PURPOSE_REGISTERS 16
 #define NUM_KEYS 16
 #define GFX_XAXIS 64
@@ -120,6 +121,8 @@ void execute_opcode_0xFX15(chip8_t* chip);
 void execute_opcode_0xFX18(chip8_t* chip);
 // 0xFX1E (ADD): The values of I and Vx are added, and the results are stored in I.
 void execute_opcode_0xFX1E(chip8_t* chip);
+// 0xFX29 (LD): The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal font.
+void execute_opcode_0xFX29(chip8_t* chip);
 // 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 void execute_opcode_0xFX33(chip8_t* chip);
 
