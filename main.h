@@ -127,6 +127,8 @@ void execute_opcode_0xFX29(chip8_t* chip);
 void execute_opcode_0xFX33(chip8_t* chip);
 // 0xFX55 (LD): Store registers V0 through Vx in memory starting at location I.
 void execute_opcode_0xFX55(chip8_t* chip);
+// 0xFX65 (LD): Read registers V0 through Vx from memory starting at location I.
+void execute_opcode_0xFX65(chip8_t* chip);
 
 // Emulator operations prototypes:
 void emulate_cycle(chip8_t* c);

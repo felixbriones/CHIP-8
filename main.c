@@ -230,6 +230,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x0055:
 					execute_opcode_0xFX55(chip);
 					break;
+				// 0xFX65 (LD): Read registers V0 through Vx from memory starting at location I.
+				case 0x0065:
+					execute_opcode_0xFX65(chip);
+					break;
 				default:
 					printf("Unknown opcode: %d\r\n", chip->opcode);
 			}
@@ -662,6 +666,19 @@ void execute_opcode_0xFX55(chip8_t* chip)
 	for(uint8_t j = 0; j <= x; j++)
 	{
 		chip->memory[chip->i + j] = chip->v[j];
+	}
+	chip->pc += 2;
+}
+
+// 0xFX65 (LD): Read registers V0 through Vx from memory starting at location I.
+// The interpreter reads values from memory starting at location I into registers V0 through Vx.
+void execute_opcode_0xFX65(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+
+	for(uint8_t j = 0; j <= x; j++)
+	{
+		chip->v[j] = chip->memory[chip->i + j];
 	}
 	chip->pc += 2;
 }
