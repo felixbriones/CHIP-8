@@ -82,7 +82,7 @@ void emulate_cycle(chip8_t* chip)
 			{
 				// 0x00E0: Clear screen
 				case 0x0000:
-					execute_opcode_0x00E0();
+					execute_opcode_0x00E0(chip);
 					break;
 				// 0x00EE: Return from subroutine
 				case 0x00EE:
@@ -269,8 +269,10 @@ void handle_sound_timer(chip8_t* chip)
 }
 
 // 0x0000 (CLS): Clear screen
-void execute_opcode_0x00E0(void)
+void execute_opcode_0x00E0(chip8_t* chip)
 {
+	memset(chip->gfx, 0, sizeof(chip->gfx));
+	chip->pc += 2;
 }
 
 // 0x00EE (RET): Return from subroutine. The interpreter sets the program counter to the address at the top of the stack, 

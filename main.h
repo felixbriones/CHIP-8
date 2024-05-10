@@ -62,8 +62,8 @@ typedef struct chip8_t
 } chip8_t;
 
 // Opcode execution prototypes:
-// 0x0000: Clear screen
-void execute_opcode_0x00E0(void);
+// 0x0000 (CLS): Clear screen
+void execute_opcode_0x00E0(chip8_t* chip);
 // 0x00EE: Return from subroutine
 void execute_opcode_0x00EE(chip8_t* chip);
 // 0x1NNN (JP): Jump to subroutine @ NNN 
