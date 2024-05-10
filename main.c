@@ -210,6 +210,10 @@ void emulate_cycle(chip8_t* chip)
 				case 0x0015:
 					execute_opcode_0xFX15(chip);
 					break;
+				// 0xFX18 (LD): ST is set equal to the value of Vx.
+				case 0x0018:
+					execute_opcode_0xFX18(chip);
+					break;
 				// 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 				case 0x0033:
 					execute_opcode_0xFX33(chip);
@@ -592,6 +596,16 @@ void execute_opcode_0xFX15(chip8_t* chip)
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
 
 	chip->delay_timer = chip->v[x];
+	chip->pc += 2;
+}
+
+// 0xFX18 (LD): ST is set equal to the value of Vx.
+// Set sound timer = Vx.
+void execute_opcode_0xFX18(chip8_t* chip)
+{
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+
+	chip->sound_timer = chip->v[x];
 	chip->pc += 2;
 }
 

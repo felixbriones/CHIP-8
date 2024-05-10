@@ -116,6 +116,8 @@ void execute_opcode_0xFX07(chip8_t* chip);
 void execute_opcode_0xFX0A(chip8_t* chip);
 // 0xFX15 (LD): DT is set equal to the value of Vx.
 void execute_opcode_0xFX15(chip8_t* chip);
+// 0xFX18 (LD): ST is set equal to the value of Vx.
+void execute_opcode_0xFX18(chip8_t* chip);
 // 0xFX33 (LD): Store BCD representation of Vx in memory locations I, I+1, and I+2
 void execute_opcode_0xFX33(chip8_t* chip);
 
