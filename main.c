@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <unistd.h>
+#include <SDL2/SDL.h>
 #include "main.h"
 
 void initialize_chip(chip8_t* c);
@@ -12,12 +13,13 @@ void initialize_chip(chip8_t* c);
 int main(int argc, char** argv)
 {
 	chip8_t chip;
+	SDL_Window* window = NULL;
+	SDL_Renderer* render = NULL;
 
-
-	//setup_graphics();
+	setup_graphics(&window, &render);
 	//setup_input();
 	
-	initialize_chip(&chip);
+	initialize_chip(&chip) ;
 	//load_game();
 
 	for(;;)
@@ -28,14 +30,56 @@ int main(int argc, char** argv)
 		// Update screen if draw flag is set
 		if(chip.draw_flag)
 		{
-			//draw_graphics();
+			draw_graphics(&window, &render, &chip);
 		}
 		
 		// Store key press state (Press & release)
 		//set_keys();
 	}
 
+	SDL_Delay(DELAY_SDL_60FPS);
 	return 0;	
+}
+
+int setup_graphics(SDL_Window** window, SDL_Renderer** renderer)
+{
+	int retval = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+	*window = SDL_CreateWindow("Felix's CHIP-8 Emulator", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, GFX_XAXIS, GFX_YAXIS, SDL_WINDOW_SHOWN);
+	// Create render for var: window, initialize using first rendering driver available which supports requested features. Use hardware accel if possible
+	*renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
+	printf("SDL_Init completed with code: %d\n", retval);
+	return retval;
+}
+
+int draw_graphics(SDL_Window** window, SDL_Renderer** renderer, chip8_t* chip)
+{
+	// Set color for clearing screen to black
+	SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255);
+	// Clear the renderer with the specified color
+	SDL_RenderClear(*renderer);
+	// Set color for clearing screen to white
+	SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255);
+
+	// Loop through each pixel in the display
+	for(uint8_t y = 0; y < GFX_YAXIS; y++)
+	{
+		for(uint8_t x = 0; x < GFX_XAXIS; x++)
+		{
+			// If the rectangle is set, draw a white rectangle at its location
+			// display[y * 64 + x] != 0
+			if(chip->gfx[x * y])
+			{
+				// Define the rectangle representing the pixel. A pixel in CHIP-8 is set to 10 pixels
+				// {x coordinate, y coordinate, width, height}
+				SDL_Rect pixel = {x * PIXEL_WIDTH, y * PIXEL_HEIGHT, PIXEL_WIDTH, PIXEL_HEIGHT};	
+				// Draw the rectangle on the renderer
+				SDL_RenderFillRect(*renderer, &pixel);
+			}
+		}	
+	}	
+
+	// Present the rendered display
+	SDL_RenderPresent(*renderer);
 }
 
 void initialize_chip(chip8_t* chip)
@@ -60,7 +104,7 @@ void initialize_chip(chip8_t* chip)
 	// Load fontset. Should be loaded into memory address 0x50
 	for(int i = 0; i < FONTSET_SIZE; ++i)
 	{
-	//	chip->memory[i + OFFSET_FONT] = chip8_fontset[i];	
+		chip->memory[i + OFFSET_FONT] = chip8_fontset[i];	
 	}
 
 	// Reset timers
