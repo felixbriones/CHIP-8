@@ -15,6 +15,7 @@
 #define PIXEL_HEIGHT 10
 #define PIXEL_WIDTH 10
 #define DELAY_SDL_60FPS 2
+#define GAME_START_ADDRESS 0x200
 
 /* Input keys
  * Keypad       Keyboard
@@ -84,6 +85,7 @@ typedef struct chip8_t
 
 } chip8_t;
 
+void load_game(chip8_t* chip, char* game_rom);
 int setup_graphics(SDL_Window** window, SDL_Renderer** renderer);
 int draw_graphics(SDL_Window** window, SDL_Renderer** renderer, chip8_t* chip);
 

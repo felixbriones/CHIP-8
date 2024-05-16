@@ -16,11 +16,18 @@ int main(int argc, char** argv)
 	SDL_Window* window = NULL;
 	SDL_Renderer* render = NULL;
 
+	// If no ROM file is provided, print usage and terminate
+	if(argc != 2)
+	{
+		printf("Usage: %s\n", argv[0]);
+		return 1;
+	}
+
 	setup_graphics(&window, &render);
 	//setup_input();
 	
 	initialize_chip(&chip) ;
-	//load_game();
+	load_game(&chip, argv[1]);
 
 	for(;;)
 	{
@@ -39,6 +46,41 @@ int main(int argc, char** argv)
 
 	SDL_Delay(DELAY_SDL_60FPS);
 	return 0;	
+}
+
+
+/* @brief: After initializing the system, load ROM into memory
+ * @arg chip:
+ * @arg game_rom:
+ * @return: */
+void load_game(chip8_t* chip, char* game_rom)
+{
+	// Open file in read-only/binary mode
+	FILE* file = fopen(game_rom, "rb");
+	uint32_t rom_size = 0;
+
+	if(file == NULL)
+	{
+		printf("Could not open game file\n");
+		exit(1);
+	} 
+
+	// Move file pointer to end of file
+	fseek(file, 0, SEEK_END);
+	// Get the current position of the file pointer, which is file size
+	rom_size = ftell(file);
+	
+	// Exit if ROM is too large to store in memory
+	if(rom_size > SIZE_MEMORY - GAME_START_ADDRESS)
+	{
+		printf("Game ROM is too large. Exiting...\n");
+		fclose(file);
+		exit(1);
+	}
+
+	// Copy game logic into memory, starting at memory address 0x200
+	fread(chip->memory + GAME_START_ADDRESS, sizeof(uint8_t), rom_size, file);
+	fclose(file);
 }
 
 int setup_graphics(SDL_Window** window, SDL_Renderer** renderer)
