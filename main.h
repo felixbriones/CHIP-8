@@ -85,6 +85,7 @@ typedef struct chip8_t
 
 } chip8_t;
 
+void setup_input(chip8_t* chip, SDL_Event* event);
 void load_game(chip8_t* chip, char* game_rom);
 int setup_graphics(SDL_Window** window, SDL_Renderer** renderer);
 int draw_graphics(SDL_Window** window, SDL_Renderer** renderer, chip8_t* chip);

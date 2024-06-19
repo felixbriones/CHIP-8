@@ -13,6 +13,7 @@ void initialize_chip(chip8_t* c);
 int main(int argc, char** argv)
 {
 	chip8_t chip;
+	SDL_Event event;
 	SDL_Window* window = NULL;
 	SDL_Renderer* render = NULL;
 
@@ -24,9 +25,8 @@ int main(int argc, char** argv)
 	}
 
 	setup_graphics(&window, &render);
-	//setup_input();
-	
-	initialize_chip(&chip) ;
+	setup_input(&chip, &event);
+	initialize_chip(&chip);
 	load_game(&chip, argv[1]);
 
 	for(;;)
@@ -41,13 +41,137 @@ int main(int argc, char** argv)
 		}
 		
 		// Store key press state (Press & release)
-		//set_keys();
+		// set_keys();
 	}
 
 	SDL_Delay(DELAY_SDL_60FPS);
 	return 0;	
 }
 
+void setup_input(chip8_t* chip, SDL_Event* event)
+{
+	// Poll for currently pending events, grabbing next one from event queue if available. Returns 0 if there are none
+	// Automatically removes event in question from queue
+	while(SDL_PollEvent(event) != 0)
+	{
+		// Examines what type of event is being examined
+		switch(event->type)		
+		{
+			// Quit if escape key is press. Note: These macros are defined by the SDL SDK
+			case SDLK_ESCAPE:
+				exit(0);
+				break;
+			// Take action if key is pressed down
+			case SDL_KEYDOWN:
+				switch (event->key.keysym.sym)
+				{
+					case SDLK_1:
+						chip->key[0x0] = 1;
+						break;
+					case SDLK_2:
+						chip->key[0x1] = 1;
+						break;
+					case SDLK_3:
+						chip->key[0x2] = 1;
+						break;
+					case SDLK_4:
+						chip->key[0x3] = 1;
+						break;
+					case SDLK_q:
+						chip->key[0x4] = 1;
+						break;
+					case SDLK_w:
+						chip->key[0x5] = 1;
+						break;
+					case SDLK_e:
+						chip->key[0x6] = 1;
+						break;
+					case SDLK_r:
+						chip->key[0x7] = 1;
+						break;
+					case SDLK_a:
+						chip->key[0x8] = 1;
+						break;
+					case SDLK_s:
+						chip->key[0x9] = 1;
+						break;
+					case SDLK_d:
+						chip->key[0xA] = 1;
+						break;
+					case SDLK_f:
+						chip->key[0xB] = 1;
+						break;
+					case SDLK_z:
+						chip->key[0xC] = 1;
+						break;
+					case SDLK_x:
+						chip->key[0xD] = 1;
+						break;
+					case SDLK_c:
+						chip->key[0xE] = 1;
+						break;
+					case SDLK_v:
+						chip->key[0xF] = 1;
+						break;
+					break;
+				}
+			// Take action if key is released 
+			case SDL_KEYUP:
+				switch (event->key.keysym.sym)
+				{
+					case SDLK_1:
+						chip->key[0x0] = 0;
+						break;
+					case SDLK_2:
+						chip->key[0x1] = 0;
+						break;
+					case SDLK_3:
+						chip->key[0x2] = 0;
+						break;
+					case SDLK_4:
+						chip->key[0x3] = 0;
+						break;
+					case SDLK_q:
+						chip->key[0x4] = 0;
+						break;
+					case SDLK_w:
+						chip->key[0x5] = 0;
+						break;
+					case SDLK_e:
+						chip->key[0x6] = 0;
+						break;
+					case SDLK_r:
+						chip->key[0x7] = 0;
+						break;
+					case SDLK_a:
+						chip->key[0x8] = 0;
+						break;
+					case SDLK_s:
+						chip->key[0x9] = 0;
+						break;
+					case SDLK_d:
+						chip->key[0xA] = 0;
+						break;
+					case SDLK_f:
+						chip->key[0xB] = 0;
+						break;
+					case SDLK_z:
+						chip->key[0xC] = 0;
+						break;
+					case SDLK_x:
+						chip->key[0xD] = 0;
+						break;
+					case SDLK_c:
+						chip->key[0xE] = 0;
+						break;
+					case SDLK_v:
+						chip->key[0xF] = 0;
+						break;
+					break;
+				}
+		}
+	}
+}
 
 /* @brief: After initializing the system, load ROM into memory
  * @arg chip:
