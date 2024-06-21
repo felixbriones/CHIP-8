@@ -25,7 +25,6 @@ int main(int argc, char** argv)
 	}
 
 	setup_graphics(&window, &render);
-	setup_input(&chip, &event);
 	initialize_chip(&chip);
 	load_game(&chip, argv[1]);
 
@@ -38,13 +37,16 @@ int main(int argc, char** argv)
 		if(chip.draw_flag)
 		{
 			draw_graphics(&window, &render, &chip);
+			chip.draw_flag = false;
 		}
 		
+		SDL_Delay(DELAY_SDL_60FPS);
+
 		// Store key press state (Press & release)
+		setup_input(&chip, &event);
 		// set_keys();
 	}
 
-	SDL_Delay(DELAY_SDL_60FPS);
 	return 0;	
 }
 
@@ -177,7 +179,7 @@ void setup_input(chip8_t* chip, SDL_Event* event)
  * @arg chip:
  * @arg game_rom:
  * @return: */
-void load_game(chip8_t* chip, char* game_rom)
+void load_game(chip8_t* chip, const char* game_rom)
 {
 	// Open file in read-only/binary mode
 	FILE* file = fopen(game_rom, "rb");
@@ -193,6 +195,8 @@ void load_game(chip8_t* chip, char* game_rom)
 	fseek(file, 0, SEEK_END);
 	// Get the current position of the file pointer, which is file size
 	rom_size = ftell(file);
+	 // Reset file pointer to start. Note: Mandatory, otherwise we won't read from beginning of file
+    	fseek(file, 0, SEEK_SET);
 	
 	// Exit if ROM is too large to store in memory
 	if(rom_size > SIZE_MEMORY - GAME_START_ADDRESS)
@@ -258,6 +262,8 @@ void initialize_chip(chip8_t* chip)
 	chip->i = 0;
 	// Reset stack pointer
 	chip->sp = 0;
+	// Clear draw flag 
+	chip->draw_flag = false;
 	// Clear display
 	memset(chip->gfx, 0, sizeof(chip->gfx));	
 	// Clear stack
@@ -283,6 +289,8 @@ void emulate_cycle(chip8_t* chip)
 	// Fetch opcode from memory pointed to by PC
 	// Note: Each address has only 1 byte of an opcode, but opcodes are 2 bytes long. Fetch 2 successive bytes and merge them
 	chip->opcode = (chip->memory[chip->pc] << 8) | chip->memory[chip->pc + 1];
+	printf("Fetched opcode 0x: %04X\n", chip->opcode);
+	printf("Program counter 0x: %04X\n", chip->pc);
 	
 	// Decode opcode. Look at the most significant nibble
 	switch(chip->opcode & 0xF000)
@@ -295,7 +303,7 @@ void emulate_cycle(chip8_t* chip)
 					execute_opcode_0x00E0(chip);
 					break;
 				// 0x00EE: Return from subroutine
-				case 0x00EE:
+				case 0x000E:
 					execute_opcode_0x00EE(chip);
 					break;
 				default:
@@ -451,7 +459,6 @@ void emulate_cycle(chip8_t* chip)
 	}
 	
 	// Update timers (@60Hz)
-	usleep(PERIOD_60HZ);
 	handle_delay_timer(chip);
 	handle_sound_timer(chip);
 }
@@ -489,8 +496,8 @@ void execute_opcode_0x00E0(chip8_t* chip)
 // then subtracts 1 from the stack pointer.
 void execute_opcode_0x00EE(chip8_t* chip)
 {
-	chip->pc = chip->stack[chip->sp];
 	chip->sp--;
+	chip->pc = chip->stack[chip->sp];
 }
 
 // 0x1NNN (JP): Jump to subroutine @ NNN 
@@ -552,6 +559,7 @@ void execute_opcode_0x6XKK(chip8_t* chip)
 {
 	uint8_t byte = chip->opcode & 0x00FF;
 	chip->v[(chip->opcode & 0x0F00) >> 8] = byte;
+	chip->pc += 2;
 }
 
 // 0x7XKK (ADD): Adds the value kk to the value of register Vx, then stores the result in Vx. (Vx = Vx + kk)
@@ -559,6 +567,7 @@ void execute_opcode_0x7XKK(chip8_t* chip)
 {
 	uint8_t byte = chip->opcode & 0x00FF;
 	chip->v[(chip->opcode & 0x0F00) >> 8] += byte;
+	chip->pc += 2;
 }
 
 // 0x8XY0 (LD): Stores the value of register Vy in register Vx (Vx = Vy)
@@ -739,34 +748,46 @@ void execute_opcode_0xCXKK(chip8_t* chip)
 // In other words, set VF if a new sprite collides with what's already on screen
 void execute_opcode_0xDXYN(chip8_t* chip)
 {
-	uint16_t x = chip->v[(chip->opcode & 0x0F00) >> 8];
-	uint16_t y = chip->v[(chip->opcode & 0x00F0) >> 4];
+	uint8_t x = chip->v[(chip->opcode & 0x0F00) >> 8];
+	uint8_t y = chip->v[(chip->opcode & 0x00F0) >> 4];
+	uint8_t height = chip->opcode & 0x000F;	
 
-	uint16_t height = chip->v[chip->opcode & 0x000F];	
-	uint16_t pixel;
+	uint8_t sprite_byte;
+	uint8_t sprite_pixel;
+	uint32_t screen_pixel;
+	// Wrap around if attempting to draw off-screen per specification
+	uint8_t x_coor = chip->v[x] % GFX_XAXIS;
+	uint8_t y_coor = chip->v[y] % GFX_YAXIS;
 
 	// Reset VF
 	chip->v[0xF] = 0;
 
 	// Loop over each row
-	for(uint16_t yline = 0; yline < height; yline++)
+	for(uint8_t row = 0; row < height; row++)
 	{
 		// Fetch pixel value starting from memory location i.
-		pixel = chip->memory[chip->i + yline];
+		sprite_byte = chip->memory[chip->i + row];
 
-		// Loop over 8 bits of one row
-		for(uint16_t xline = 0; xline < SPRITE_MAX_WIDTH; xline++)
+		// Loop over 8 bits of one row. Sprites are always 8 pixels wide
+		for(uint8_t column = 0; column < SPRITE_MAX_WIDTH; column++)
 		{
-			// Check if the current evaluated pixel is set to 1 (Note that 0x80 >> xline scan through the byte, one bit at the time)
-			if(pixel & (0x80 >> xline) != 0	)
+			// Target each individual bit/pixel of sprite_byte for an AND operation
+			sprite_pixel = sprite_byte & (0x80 >> column);
+			// Determine where on screen we will draw the sprite
+			// x_coor, y_coor = starting positions / row/column = current sprite offset
+			// We multiply by VIDEO_WIDTH to properly convert 2D screen to 1D array. (i.e. first pixel of second row is index 64)
+			screen_pixel = (y_coor + row) * GFX_XAXIS + (x_coor + column);
+			
+			// Check if isolated bit/pixel is set
+			if (sprite_pixel != 0)
 			{
-				// Check if the pixel on the display is set to 1. If set, we need to register the collision by setting the VF register
-				if(chip->gfx[(x + xline + ((y + yline) * GFX_XAXIS))])
+				// 0xFFFFFFFF = white pixel. If newly-calculated sprite and current state of pixel are both on, a collision has occurred
+				if(chip->gfx[screen_pixel] == 0xFFFFFFFF)
 				{
 					chip->v[0xF] = 1;	
 				}
-				// Set the pixel value by using XOR
-				chip->gfx[(x + xline + ((y + yline) * GFX_XAXIS))] ^= 1;
+				// If pixel is white, turn it black and vice versa. Specification indicates toggling pixel if collision occurs
+				chip->gfx[screen_pixel] ^= 0xFFFFFFFF;
 			}
 		}
 	}

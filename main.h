@@ -14,7 +14,7 @@
 #define PERIOD_60HZ 16667
 #define PIXEL_HEIGHT 10
 #define PIXEL_WIDTH 10
-#define DELAY_SDL_60FPS 2
+#define DELAY_SDL_60FPS 16
 #define GAME_START_ADDRESS 0x200
 
 /* Input keys
@@ -62,7 +62,7 @@ typedef struct chip8_t
 	// Chip 8 has 15 general registers while the 16th is used for the carry flag
 	uint8_t v[NUM_GENERAL_PURPOSE_REGISTERS];
 	// Chip 8 aspect ratio is 64x32
-	uint8_t gfx[GFX_XAXIS * GFX_YAXIS];
+	uint32_t gfx[GFX_XAXIS * GFX_YAXIS];
 	// Chip 8 has 2 timers @ 60Hz. Count down to 0 when set above 0
 	uint8_t delay_timer;
 	// Sound timer buzzes upon reaching 0
@@ -86,7 +86,8 @@ typedef struct chip8_t
 } chip8_t;
 
 void setup_input(chip8_t* chip, SDL_Event* event);
-void load_game(chip8_t* chip, char* game_rom);
+//void load_game(chip8_t* chip, char* game_rom);
+void load_game(chip8_t* chip, const char* game_rom);
 int setup_graphics(SDL_Window** window, SDL_Renderer** renderer);
 int draw_graphics(SDL_Window** window, SDL_Renderer** renderer, chip8_t* chip);
 
