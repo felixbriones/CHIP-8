@@ -8,6 +8,7 @@
 #define NUM_KEYS 16
 #define GFX_XAXIS 64
 #define GFX_YAXIS 32
+#define GFX_SCALE 10 
 #define OFFSET_FONT 50
 #define FONTSET_SIZE 80
 #define SPRITE_MAX_WIDTH 8

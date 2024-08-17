@@ -64,6 +64,7 @@ void setup_input(chip8_t* chip, SDL_Event* event)
 			case SDL_QUIT:
 				exit(0);
 				break;
+			break;
 			// Take action if key is pressed down
 			case SDL_KEYDOWN:
 				switch (event->key.keysym.sym)
@@ -118,6 +119,7 @@ void setup_input(chip8_t* chip, SDL_Event* event)
 						break;
 					break;
 				}
+				break;
 			// Take action if key is released 
 			case SDL_KEYUP:
 				switch (event->key.keysym.sym)
@@ -172,6 +174,7 @@ void setup_input(chip8_t* chip, SDL_Event* event)
 						break;
 					break;
 				}
+				break;
 		}
 	}
 }
@@ -215,7 +218,8 @@ void load_game(chip8_t* chip, const char* game_rom)
 int setup_graphics(SDL_Window** window, SDL_Renderer** renderer)
 {
 	int retval = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-	*window = SDL_CreateWindow("Felix's CHIP-8 Emulator", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, GFX_XAXIS, GFX_YAXIS, SDL_WINDOW_SHOWN);
+	*window = SDL_CreateWindow("Felix's CHIP-8 Emulator", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
+		GFX_XAXIS * GFX_SCALE, GFX_YAXIS * GFX_SCALE, SDL_WINDOW_SHOWN);
 	// Create render for var: window, initialize using first rendering driver available which supports requested features. Use hardware accel if possible
 	*renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
 	printf("SDL_Init completed with code: %d\n", retval);
