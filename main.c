@@ -387,6 +387,7 @@ void emulate_cycle(chip8_t* chip)
 				default:
 					printf("Unknown opcode: %d\r\n", chip->opcode);
 			}
+			break;
 		// 0x9XY0 (SNE): The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
 		case 0x9000:
 			execute_opcode_0x9XY0(chip);
@@ -589,6 +590,7 @@ void execute_opcode_0x8XY0(chip8_t* chip)
 
 	// Load Vy into Vx 
 	chip->v[x] = vy;
+	chip->pc += 2;
 }
 
 // 0x8XY1 (OR): OR operation with Vx and Vy. Result stored in Vx (Vx = Vx OR Vy)
@@ -600,6 +602,7 @@ void execute_opcode_0x8XY1(chip8_t* chip)
 
 	// Perform OR operation and store in Vx
 	chip->v[x] = vx|vy;
+	chip->pc += 2;
 }
 
 // 0x8XY2 (AND): AND operation with Vx and Vy. Result stored in Vx (Vx = Vx AND Vy)
@@ -611,6 +614,7 @@ void execute_opcode_0x8XY2(chip8_t* chip)
 
 	// Perform AND operation and store in Vx
 	chip->v[x] = vx&vy;
+	chip->pc += 2;
 }
 
 // 0x8XY3 (XOR): XOR operation with Vx and Vy. Result stored in Vx (Vx = Vx XOR Vy)
@@ -622,6 +626,7 @@ void execute_opcode_0x8XY3(chip8_t* chip)
 
 	// Perform XOR operation and store in Vx
 	chip->v[x] = vx&vy;
+	chip->pc += 2;
 }
 
 // 0x8XY4 (ADD): Add Vy to Vx. If sum is greater than 255, VF is set 1 (0 otherwise). Sum stored in Vx 
@@ -629,10 +634,12 @@ void execute_opcode_0x8XY4(chip8_t* chip)
 {
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
 	uint8_t vx = chip->v[x];
-	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
+	uint8_t y = (chip->opcode & 0x00F0) >> 4;
+	uint8_t vy = chip->v[y];
+	uint16_t sum = vx + vy;
 
 	// Check if sum is greater than 255
-	if(vx > 0xFF - vy) 
+	if(sum > 255) 
 	{
 		chip->v[0xF] = 1;	
 	} 
@@ -641,7 +648,7 @@ void execute_opcode_0x8XY4(chip8_t* chip)
 		chip->v[0xF] = 0;	
 	}
 
-	chip->v[x] += vy;
+	chip->v[x] = sum & 0xFF;
 	chip->pc += 2;
 }
 
@@ -651,13 +658,20 @@ void execute_opcode_0x8XY5(chip8_t* chip)
 {
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
 	uint8_t vx = chip->v[x];
-	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
-	
-	// Set VF if appropriate 
-	chip->v[0xF] = (vx > vy) ? 1 : 0;
+	uint8_t y = (chip->opcode & 0x00F0) >> 4;
+	uint8_t vy = chip->v[y];
 
-	// Subtract
-	chip->v[x] -= vy;
+	// Check if sum is greater than 255
+	if(vx > vy) 
+	{
+		chip->v[0xF] = 1;	
+	} 
+	else
+	{
+		chip->v[0xF] = 0;	
+	}
+
+	chip->v[x] = vx - vy;
 	chip->pc += 2;
 }
 
