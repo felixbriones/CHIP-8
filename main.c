@@ -60,7 +60,8 @@ void setup_input(chip8_t* chip, SDL_Event* event)
 		switch(event->type)		
 		{
 			// Quit if escape key is press. Note: These macros are defined by the SDL SDK
-			case SDLK_ESCAPE:
+			//case SDLK_ESCAPE:
+			case SDL_QUIT:
 				exit(0);
 				break;
 			// Take action if key is pressed down
@@ -228,7 +229,7 @@ int draw_graphics(SDL_Window** window, SDL_Renderer** renderer, chip8_t* chip)
 	// Clear the renderer with the specified color
 	SDL_RenderClear(*renderer);
 	// Set color for clearing screen to white
-	SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(*renderer, 0, 255, 255, 255);
 
 	// Loop through each pixel in the display
 	for(uint8_t y = 0; y < GFX_YAXIS; y++)
@@ -237,7 +238,7 @@ int draw_graphics(SDL_Window** window, SDL_Renderer** renderer, chip8_t* chip)
 		{
 			// If the rectangle is set, draw a white rectangle at its location
 			// display[y * 64 + x] != 0
-			if(chip->gfx[x * y])
+			if(chip->gfx[y * GFX_XAXIS + x])
 			{
 				// Define the rectangle representing the pixel. A pixel in CHIP-8 is set to 10 pixels
 				// {x coordinate, y coordinate, width, height}
@@ -286,12 +287,14 @@ void initialize_chip(chip8_t* chip)
 
 void emulate_cycle(chip8_t* chip)
 {
+	// Felix: Fetch
 	// Fetch opcode from memory pointed to by PC
 	// Note: Each address has only 1 byte of an opcode, but opcodes are 2 bytes long. Fetch 2 successive bytes and merge them
 	chip->opcode = (chip->memory[chip->pc] << 8) | chip->memory[chip->pc + 1];
 	printf("Fetched opcode 0x: %04X\n", chip->opcode);
 	printf("Program counter 0x: %04X\n", chip->pc);
 	
+	// Felix: Decode
 	// Decode opcode. Look at the most significant nibble
 	switch(chip->opcode & 0xF000)
 	{
@@ -492,12 +495,14 @@ void execute_opcode_0x00E0(chip8_t* chip)
 	chip->pc += 2;
 }
 
+//Felix
 // 0x00EE (RET): Return from subroutine. The interpreter sets the program counter to the address at the top of the stack, 
 // then subtracts 1 from the stack pointer.
 void execute_opcode_0x00EE(chip8_t* chip)
 {
 	chip->sp--;
 	chip->pc = chip->stack[chip->sp];
+	chip->pc += 2;
 }
 
 // 0x1NNN (JP): Jump to subroutine @ NNN 
@@ -507,6 +512,7 @@ void execute_opcode_0x1NNN(chip8_t* chip)
 	chip->pc = chip->opcode & 0xFFF;
 }
 
+// Felix: 
 // 0x2NNN (CALL): Call subroutine @ NNN 
 // Place current address of PC on stack, jump to subroutine, increment SP, and update PC
 void execute_opcode_0x2NNN(chip8_t* chip)
@@ -748,8 +754,8 @@ void execute_opcode_0xCXKK(chip8_t* chip)
 // In other words, set VF if a new sprite collides with what's already on screen
 void execute_opcode_0xDXYN(chip8_t* chip)
 {
-	uint8_t x = chip->v[(chip->opcode & 0x0F00) >> 8];
-	uint8_t y = chip->v[(chip->opcode & 0x00F0) >> 4];
+	uint8_t x = (chip->opcode & 0x0F00) >> 8;
+	uint8_t y = (chip->opcode & 0x00F0) >> 4;
 	uint8_t height = chip->opcode & 0x000F;	
 
 	uint8_t sprite_byte;
