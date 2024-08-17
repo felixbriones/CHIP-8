@@ -625,7 +625,7 @@ void execute_opcode_0x8XY3(chip8_t* chip)
 	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
 
 	// Perform XOR operation and store in Vx
-	chip->v[x] = vx&vy;
+	chip->v[x] = vx^vy;
 	chip->pc += 2;
 }
 
