@@ -652,7 +652,7 @@ void execute_opcode_0x8XY4(chip8_t* chip)
 	chip->pc += 2;
 }
 
-// 0x8XY5 (SUB): If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
+// 0x8XY5 (SUB): If Vx >= Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
 // Set Vx = Vx - Vy, set VF = NOT borrow.
 void execute_opcode_0x8XY5(chip8_t* chip)
 {
@@ -661,8 +661,8 @@ void execute_opcode_0x8XY5(chip8_t* chip)
 	uint8_t y = (chip->opcode & 0x00F0) >> 4;
 	uint8_t vy = chip->v[y];
 
-	// Check if sum is greater than 255
-	if(vx > vy) 
+	// Check if Vx is greater than Vy
+	if(vx >= vy) 
 	{
 		chip->v[0xF] = 1;	
 	} 
