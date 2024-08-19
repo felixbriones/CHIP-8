@@ -638,6 +638,9 @@ void execute_opcode_0x8XY4(chip8_t* chip)
 	uint8_t vy = chip->v[y];
 	uint16_t sum = vx + vy;
 
+	// Perform mathemtical operation first, THEN set value v[0xF]
+	chip->v[x] = sum & 0xFF;
+
 	// Check if sum is greater than 255
 	if(sum > 255) 
 	{
@@ -648,7 +651,6 @@ void execute_opcode_0x8XY4(chip8_t* chip)
 		chip->v[0xF] = 0;	
 	}
 
-	chip->v[x] = sum & 0xFF;
 	chip->pc += 2;
 }
 
@@ -661,6 +663,8 @@ void execute_opcode_0x8XY5(chip8_t* chip)
 	uint8_t y = (chip->opcode & 0x00F0) >> 4;
 	uint8_t vy = chip->v[y];
 
+	chip->v[x] = vx - vy;
+
 	// Check if Vx is greater than Vy
 	if(vx >= vy) 
 	{
@@ -671,7 +675,6 @@ void execute_opcode_0x8XY5(chip8_t* chip)
 		chip->v[0xF] = 0;	
 	}
 
-	chip->v[x] = vx - vy;
 	chip->pc += 2;
 }
 
@@ -681,11 +684,11 @@ void execute_opcode_0x8XY6(chip8_t* chip)
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
 	uint8_t vx = chip->v[x];
 
-	// Set VF if appropriate 
-	chip->v[0xF] = (vx & 0x1) ? 1 : 0;
-	
 	// Divide Vx by 2
 	chip->v[x] /= 2;
+
+	// Set VF if appropriate 
+	chip->v[0xF] = (vx & 0x1) ? 1 : 0;
 	chip->pc += 2;
 }
 
@@ -697,11 +700,11 @@ void execute_opcode_0x8XY7(chip8_t* chip)
 	uint8_t vx = chip->v[x];
 	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
 
-	// Set VF if appropriate 
-	chip->v[0xF] = (vy >= vx) ? 1 : 0;
-	
 	// Subtract Vy from Vx
 	chip->v[x] = vy - vx;
+
+	// Set VF if appropriate 
+	chip->v[0xF] = (vy >= vx) ? 1 : 0;
 	chip->pc += 2;
 }
 
@@ -712,11 +715,11 @@ void execute_opcode_0x8XYE(chip8_t* chip)
 	uint8_t x = (chip->opcode & 0x0F00) >> 8;
 	uint8_t vx = chip->v[x];
 
-	// Set VF if MSB is set
-	chip->v[0xF] = (vx & 0x80) >> 7;
-	
 	// Multiply Vx by 2 by shifting left
 	chip->v[x] <<= 1;
+
+	// Set VF if MSB is set
+	chip->v[0xF] = (vx & 0x80) >> 7;
 	chip->pc += 2;
 }
 
