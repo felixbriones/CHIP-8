@@ -689,7 +689,7 @@ void execute_opcode_0x8XY6(chip8_t* chip)
 	chip->pc += 2;
 }
 
-// 0x8XY7 (SUBN): If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
+// 0x8XY7 (SUBN): If Vy >= Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
 // Set Vx = Vy - Vx, set VF = NOT borrow.
 void execute_opcode_0x8XY7(chip8_t* chip)
 {
@@ -698,7 +698,7 @@ void execute_opcode_0x8XY7(chip8_t* chip)
 	uint8_t vy = chip->v[(chip->opcode & 0x00F0) >> 4];
 
 	// Set VF if appropriate 
-	chip->v[0xF] = (vy > vx) ? 1 : 0;
+	chip->v[0xF] = (vy >= vx) ? 1 : 0;
 	
 	// Subtract Vy from Vx
 	chip->v[x] = vy - vx;
