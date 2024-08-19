@@ -713,10 +713,10 @@ void execute_opcode_0x8XYE(chip8_t* chip)
 	uint8_t vx = chip->v[x];
 
 	// Set VF if MSB is set
-	chip->v[0xF] = (vx & 0x80 == 0x80) ? 1 : 0;
+	chip->v[0xF] = (vx & 0x80) >> 7;
 	
-	// Multiply Vx by 2
-	chip->v[x] *= 2;
+	// Multiply Vx by 2 by shifting left
+	chip->v[x] <<= 1;
 	chip->pc += 2;
 }
 
