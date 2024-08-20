@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 			chip.draw_flag = false;
 		}
 		
-		SDL_Delay(DELAY_SDL_60FPS);
+		//SDL_Delay(DELAY_SDL_60FPS);
 
 		// Store key press state (Press & release)
 		setup_input(&chip, &event);
@@ -67,110 +67,144 @@ void setup_input(chip8_t* chip, SDL_Event* event)
 			break;
 			// Take action if key is pressed down
 			case SDL_KEYDOWN:
+				printf("Key pressed down: ");
 				switch (event->key.keysym.sym)
 				{
 					case SDLK_1:
-						chip->key[0x0] = 1;
+						chip->key[0x1] = 1;
+						printf("1\r\n");
 						break;
 					case SDLK_2:
-						chip->key[0x1] = 1;
+						chip->key[0x2] = 1;
+						printf("2\r\n");
 						break;
 					case SDLK_3:
-						chip->key[0x2] = 1;
+						chip->key[0x3] = 1;
+						printf("3\r\n");
 						break;
 					case SDLK_4:
-						chip->key[0x3] = 1;
+						chip->key[0xC] = 1;
+						printf("4\r\n");
 						break;
 					case SDLK_q:
 						chip->key[0x4] = 1;
+						printf("q\r\n");
 						break;
 					case SDLK_w:
 						chip->key[0x5] = 1;
+						printf("w\r\n");
 						break;
 					case SDLK_e:
 						chip->key[0x6] = 1;
+						printf("e\r\n");
 						break;
 					case SDLK_r:
-						chip->key[0x7] = 1;
+						chip->key[0xD] = 1;
+						printf("r\r\n");
 						break;
 					case SDLK_a:
-						chip->key[0x8] = 1;
+						chip->key[0x7] = 1;
+						printf("a\r\n");
 						break;
 					case SDLK_s:
-						chip->key[0x9] = 1;
+						chip->key[0x8] = 1;
+						printf("s\r\n");
 						break;
 					case SDLK_d:
-						chip->key[0xA] = 1;
+						chip->key[0x9] = 1;
+						printf("d\r\n");
 						break;
 					case SDLK_f:
-						chip->key[0xB] = 1;
+						chip->key[0xE] = 1;
+						printf("f\r\n");
 						break;
 					case SDLK_z:
-						chip->key[0xC] = 1;
+						chip->key[0xA] = 1;
+						printf("z\r\n");
 						break;
 					case SDLK_x:
-						chip->key[0xD] = 1;
+						chip->key[0x0] = 1;
+						printf("x\r\n");
 						break;
 					case SDLK_c:
-						chip->key[0xE] = 1;
+						chip->key[0xB] = 1;
+						printf("c\r\n");
 						break;
 					case SDLK_v:
 						chip->key[0xF] = 1;
+						printf("v\r\n");
 						break;
 					break;
 				}
 				break;
 			// Take action if key is released 
 			case SDL_KEYUP:
+				printf("Key released: ");
 				switch (event->key.keysym.sym)
 				{
 					case SDLK_1:
-						chip->key[0x0] = 0;
+						chip->key[0x1] = 0;
+						printf("1\r\n");
 						break;
 					case SDLK_2:
-						chip->key[0x1] = 0;
+						chip->key[0x2] = 0;
+						printf("2\r\n");
 						break;
 					case SDLK_3:
-						chip->key[0x2] = 0;
+						chip->key[0x3] = 0;
+						printf("3\r\n");
 						break;
 					case SDLK_4:
-						chip->key[0x3] = 0;
+						chip->key[0xC] = 0;
+						printf("4\r\n");
 						break;
 					case SDLK_q:
 						chip->key[0x4] = 0;
+						printf("q\r\n");
 						break;
 					case SDLK_w:
 						chip->key[0x5] = 0;
+						printf("w\r\n");
 						break;
 					case SDLK_e:
 						chip->key[0x6] = 0;
+						printf("e\r\n");
 						break;
 					case SDLK_r:
-						chip->key[0x7] = 0;
+						chip->key[0xD] = 0;
+						printf("r\r\n");
 						break;
 					case SDLK_a:
-						chip->key[0x8] = 0;
+						chip->key[0x7] = 0;
+						printf("a\r\n");
 						break;
 					case SDLK_s:
-						chip->key[0x9] = 0;
+						chip->key[0x8] = 0;
+						printf("s\r\n");
 						break;
 					case SDLK_d:
-						chip->key[0xA] = 0;
+						chip->key[0x9] = 0;
+						printf("d\r\n");
 						break;
 					case SDLK_f:
-						chip->key[0xB] = 0;
+						chip->key[0xE] = 0;
+						printf("f\r\n");
 						break;
 					case SDLK_z:
-						chip->key[0xC] = 0;
+						chip->key[0xA] = 0;
+						printf("z\r\n");
 						break;
 					case SDLK_x:
-						chip->key[0xD] = 0;
+						chip->key[0x0] = 0;
+						printf("x\r\n");
 						break;
 					case SDLK_c:
-						chip->key[0xE] = 0;
+						chip->key[0xB] = 0;
+						printf("c\r\n");
 						break;
 					case SDLK_v:
 						chip->key[0xF] = 0;
+						printf("v\r\n");
 						break;
 					break;
 				}
@@ -295,8 +329,8 @@ void emulate_cycle(chip8_t* chip)
 	// Fetch opcode from memory pointed to by PC
 	// Note: Each address has only 1 byte of an opcode, but opcodes are 2 bytes long. Fetch 2 successive bytes and merge them
 	chip->opcode = (chip->memory[chip->pc] << 8) | chip->memory[chip->pc + 1];
-	printf("Fetched opcode 0x: %04X\n", chip->opcode);
-	printf("Program counter 0x: %04X\n", chip->pc);
+	//printf("Fetched opcode 0x: %04X\n", chip->opcode);
+	//printf("Program counter 0x: %04X\n", chip->pc);
 	
 	// Felix: Decode
 	// Decode opcode. Look at the most significant nibble
@@ -314,7 +348,7 @@ void emulate_cycle(chip8_t* chip)
 					execute_opcode_0x00EE(chip);
 					break;
 				default:
-					printf("Unknown opcode: %d\r\n", chip->opcode);
+					printf("Unknown opcode: 0x%04X\n", chip->opcode);
 			}
 		break;
 		// 0x1NNN (JP): Jump to subroutine @ NNN 
@@ -385,7 +419,7 @@ void emulate_cycle(chip8_t* chip)
 					execute_opcode_0x8XYE(chip);
 					break;
 				default:
-					printf("Unknown opcode: %d\r\n", chip->opcode);
+					printf("Unknown opcode: 0x%04X\n", chip->opcode);
 			}
 			break;
 		// 0x9XY0 (SNE): The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
@@ -420,8 +454,9 @@ void emulate_cycle(chip8_t* chip)
 					execute_opcode_0xEXA1(chip);
 					break;
 				default:
-					printf("Unknown opcode: %d\r\n", chip->opcode);
+					printf("Unknown opcode: 0x%04X\n", chip->opcode);
 			}
+			break;
 		case 0xF000:
 			switch(chip->opcode & 0x00FF)
 			{
@@ -462,13 +497,13 @@ void emulate_cycle(chip8_t* chip)
 					execute_opcode_0xFX65(chip);
 					break;
 				default:
-					printf("Unknown opcode: %d\r\n", chip->opcode);
+					printf("Unknown opcode: 0x%04X\n", chip->opcode);
 			}
 	}
 	
 	// Update timers (@60Hz)
-	handle_delay_timer(chip);
-	handle_sound_timer(chip);
+	//handle_delay_timer(chip);
+	//handle_sound_timer(chip);
 }
 
 void handle_delay_timer(chip8_t* chip)
