@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 			chip.draw_flag = false;
 		}
 		
-		//SDL_Delay(DELAY_SDL_60FPS);
+		SDL_Delay(DELAY_SDL_60FPS);
 		// Store key press state (Press & release)
 		setup_input(&chip, &event);
 	}
@@ -327,8 +327,8 @@ void emulate_cycle(chip8_t* chip)
 	// Fetch opcode from memory pointed to by PC
 	// Note: Each address has only 1 byte of an opcode, but opcodes are 2 bytes long. Fetch 2 successive bytes and merge them
 	chip->opcode = (chip->memory[chip->pc] << 8) | chip->memory[chip->pc + 1];
-	//printf("Fetched opcode 0x: %04X\n", chip->opcode);
-	//printf("Program counter 0x: %04X\n", chip->pc);
+	printf("Fetched opcode 0x: %04X\n", chip->opcode);
+	printf("Program counter 0x: %04X\n", chip->pc);
 	
 	// Felix: Decode
 	// Decode opcode. Look at the most significant nibble
@@ -635,6 +635,8 @@ void execute_opcode_0x8XY1(chip8_t* chip)
 
 	// Perform OR operation and store in Vx
 	chip->v[x] = vx|vy;
+	// VF must be set to 0, or game quirks may occur 
+	chip->v[0xF] = 0;
 	chip->pc += 2;
 }
 
@@ -647,6 +649,8 @@ void execute_opcode_0x8XY2(chip8_t* chip)
 
 	// Perform AND operation and store in Vx
 	chip->v[x] = vx&vy;
+	// VF must be set to 0, or game quirks may occur 
+	chip->v[0xF] = 0;
 	chip->pc += 2;
 }
 
@@ -659,6 +663,8 @@ void execute_opcode_0x8XY3(chip8_t* chip)
 
 	// Perform XOR operation and store in Vx
 	chip->v[x] = vx^vy;
+	// VF must be set to 0, or game quirks may occur 
+	chip->v[0xF] = 0;
 	chip->pc += 2;
 }
 
