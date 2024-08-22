@@ -41,10 +41,8 @@ int main(int argc, char** argv)
 		}
 		
 		//SDL_Delay(DELAY_SDL_60FPS);
-
 		// Store key press state (Press & release)
 		setup_input(&chip, &event);
-		// set_keys();
 	}
 
 	return 0;	
@@ -502,7 +500,7 @@ void emulate_cycle(chip8_t* chip)
 	}
 	
 	// Update timers (@60Hz)
-	//handle_delay_timer(chip);
+	handle_delay_timer(chip);
 	//handle_sound_timer(chip);
 }
 
